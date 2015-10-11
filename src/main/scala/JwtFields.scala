@@ -9,7 +9,7 @@ sealed trait JwtFieldValue {
   def value: JsValue
 }
 
-sealed trait JwtField {//[T <: Claim[T]] {
+sealed trait JwtField {
   def name: String
 }
 
