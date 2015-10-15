@@ -2,9 +2,9 @@ name := "jwt"
 
 organization := "io.igl"
 
-version := "0.0.0"
+version := "1.0.0"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.4.0",
