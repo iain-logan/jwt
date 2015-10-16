@@ -82,7 +82,58 @@ class JwtSpec extends UnitSpec {
     val encoded = jwt.encodedAndSigned(secret)
     DecodedJwt.validateEncodedJwt(encoded, secret, Algorithm.HS256, Set(Typ), Set(), Set(), Set(Iss.name)) should be (Success(jwtIgnoringIss))
     DecodedJwt.validateEncodedJwt(encoded, secret, Algorithm.HS256, Set(), Set(Iss), Set(Typ.name)) should be (Success(jwtIgnoringTyp))
+  }
 
+  it should "not be created from an encoded jwt where the algorithms do not match" in {
+    val typ = Typ("JWT")
+    val iss = Iss("hindley")
+    val jwt = new DecodedJwt(Seq(Alg(Algorithm.HS256), typ), Seq(iss))
+    val encoded = jwt.encodedAndSigned(secret)
+    DecodedJwt.validateEncodedJwt(encoded, secret, Algorithm.NONE, Set(typ.field), Set(iss.field)).isFailure should be (true)
+  }
+
+  it should "support all registered headers" in {
+    val typ = Typ("JWT")
+    val alg = Alg(Algorithm.HS256)
+    val cty = Cty
+    val headers = Seq(typ, alg, cty)
+
+    val jwt = new DecodedJwt(headers, Seq())
+    DecodedJwt.validateEncodedJwt(
+      jwt.encodedAndSigned(secret),
+      secret,
+      alg.value,
+      Set(Typ, Cty),
+      Set()) should be (Success(jwt))
+  }
+
+  it should "support all registered claims" in {
+    val alg = Alg(Algorithm.HS256)
+    val iss = Iss("hindley")
+    val sub = Sub("123456789")
+    val audSingle = Aud("users")
+    val audMany = Aud(Seq("admin", "users"))
+    val exp = Exp(1234567890L)
+    val nbf = Nbf(1234567890L)
+    val iat = Iat(1234567890L)
+    val jti = Jti("asdf1234")
+    val claimsA = Seq[ClaimValue](iss, sub, audSingle, exp, nbf, iat, jti)
+
+    val jwtA = new DecodedJwt(Seq(alg), claimsA)
+    DecodedJwt.validateEncodedJwt(
+      jwtA.encodedAndSigned(secret),
+      secret,
+      alg.value,
+      Set(),
+      claimsA.map(_.field).toSet) should be (Success(jwtA))
+    val claimsB = Seq[ClaimValue](iss, sub, audMany, exp, nbf, iat, jti)
+    val jwtB = new DecodedJwt(Seq(alg), claimsB)
+    DecodedJwt.validateEncodedJwt(
+      jwtB.encodedAndSigned(secret),
+      secret,
+      alg.value,
+      Set(),
+      claimsB.map(_.field).toSet) should be (Success(jwtB))
   }
 
 }

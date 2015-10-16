@@ -8,6 +8,15 @@ import play.api.libs.json.Json
 import scala.reflect.ClassTag
 import scala.util.Try
 
+/**
+ * A class representing a decoded jwt.
+ *
+ * When an [[Alg]] value is omitted it defaults to none. Where multiple headers or claims with the same field name are
+ * provided, the last occurrence is used.
+ *
+ * @param headers_ the values of the headers to be set
+ * @param claims_ the values of the claims to be set
+ */
 class DecodedJwt(headers_ : Seq[HeaderValue], claims_ : Seq[ClaimValue]) extends Jwt {
 
   // Sort headers and claims so that if multiple duplicate types are provided, the last header/claim of said type is selected
@@ -58,6 +67,9 @@ class DecodedJwt(headers_ : Seq[HeaderValue], claims_ : Seq[ClaimValue]) extends
   }
 
   override def hashCode(): Int = headers.hashCode() ^ claims.hashCode()
+
+  override def toString: String =
+    "DecodedJwt(" + headers.toString() + ", " + claims.toString() + ")"
 }
 
 object DecodedJwt {
@@ -93,7 +105,7 @@ object DecodedJwt {
    *
    * Any fields found in the jwt that are not in either the required set or the ignore set, will cause validation to fail.
    * Including an algorithm field in the requiredHeaders set is not needed, instead use the requiredAlg parameter.
-   * Please note that this will not validate exp and nbf claims.
+   * Please note that this will not validate exp or nbf claims.
    *
    * @param jwt an encrypted jwt
    * @param secret the secret to use when validating the signature
@@ -144,7 +156,8 @@ object DecodedJwt {
         requiredHeaders.find(x => x.name == field) match {
           case Some(requiredHeader) => requiredHeader.attemptApply(value)
           case None =>
-            ignoredHeaders.find(_ == field).getOrElse(throw new IllegalArgumentException("Found header that is in neither the required or the ignored set"))
+            ignoredHeaders.find(_ == field).
+              getOrElse(throw new IllegalArgumentException("Found header that is in neither the required or ignored sets"))
             None
         }
     }
@@ -165,7 +178,8 @@ object DecodedJwt {
         requiredClaims.find(x => x.name == field) match {
           case Some(requiredClaim) => requiredClaim.attemptApply(value)
           case None =>
-            ignoredClaims.find(_ == field).getOrElse(throw new IllegalArgumentException("Found claim that is in neither the required or the ignored set"))
+            ignoredClaims.find(_ == field).
+              getOrElse(throw new IllegalArgumentException("Found claim that is in neither the required or ignored sets"))
             None
         }
     }

@@ -2,14 +2,16 @@ package io.igl.jwt
 
 import play.api.libs.json.{JsString, JsValue}
 
-trait HeaderValue extends JwtValue
+trait HeaderValue extends JwtValue {
+  val field: HeaderField
+}
 
 trait HeaderField extends JwtField {
   def attemptApply(value: JsValue): Option[HeaderValue]
 }
 
 case class Typ(value: String) extends HeaderValue {
-  override val field: Field = Typ
+  override val field: HeaderField = Typ
   override val jsValue: JsValue = JsString(value)
 }
 
@@ -17,11 +19,11 @@ object Typ extends HeaderField {
   override def attemptApply(value: JsValue): Option[Typ] =
     value.asOpt[String].map(apply)
 
-  override val name: String = "typ"
+  override val name = "typ"
 }
 
 case class Alg(value: Algorithm) extends HeaderValue {
-  override val field = Alg
+  override val field: HeaderField = Alg
   override val jsValue: JsValue = JsString(value.name)
 }
 
@@ -36,8 +38,8 @@ object Cty extends HeaderValue with HeaderField {
   override def attemptApply(value: JsValue): Option[HeaderValue] =
     value.asOpt[String].map{case this.value => Cty}
 
-  override val name: String = "cty"
-  override val field: Field = this
-  override val value: String = "JWT"
+  override val name = "cty"
+  override val field: HeaderField = this
+  override val value = "JWT"
   override val jsValue: JsValue = JsString(value)
 }
