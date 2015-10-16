@@ -1,5 +1,7 @@
 package io.igl.jwt
 
+import play.api.libs.json.{JsNumber, JsValue}
+
 import scala.util.Success
 
 class JwtSpec extends UnitSpec {
@@ -134,6 +136,35 @@ class JwtSpec extends UnitSpec {
       alg.value,
       Set(),
       claimsB.map(_.field).toSet) should be (Success(jwtB))
+  }
+
+  it should "support private unregistered fields" in {
+
+    object Uid extends ClaimField {
+      override def attemptApply(value: JsValue): Option[ClaimValue] =
+        value.asOpt[Long].map(apply)
+
+      override val name: String = "uid"
+    }
+
+    case class Uid(value: Long) extends ClaimValue {
+      override val field: ClaimField = Uid
+      override val jsValue: JsValue = JsNumber(value)
+    }
+
+    val alg = Alg(Algorithm.HS256)
+    val uid = Uid(123456789L)
+    val jwt = new DecodedJwt(Seq(alg), Seq(uid))
+
+    jwt.getClaim[Uid] should be (Some(uid))
+
+    DecodedJwt.validateEncodedJwt(
+      jwt.encodedAndSigned(secret),
+      secret,
+      alg.value,
+      Set(),
+      Set(Uid)) should be (Success(jwt))
+
   }
 
 }
