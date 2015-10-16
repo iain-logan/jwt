@@ -48,9 +48,10 @@ class DecodedJwt(headers_ : Seq[HeaderValue], claims_ : Seq[ClaimValue]) extends
   private val algorithm = getHeader[Alg].map(_.value).get
 
   def encodedAndSigned(secret: String): String = {
+    def jsAssign(value: Value) = value.field.name -> value.jsValue
 
-    val encodedHeader: String = DecodedJwt.encodeBase64Url(JsObject(headers.map(_.jsPair)).toString())
-    val encodedPayload: String = DecodedJwt.encodeBase64Url(JsObject(claims.map(_.jsPair)).toString())
+    val encodedHeader: String = DecodedJwt.encodeBase64Url(JsObject(headers.map(jsAssign)).toString())
+    val encodedPayload: String = DecodedJwt.encodeBase64Url(JsObject(claims.map(jsAssign)).toString())
     val encodedHeaderAndPayload: String = encodedHeader ++ ('.' +: encodedPayload)
 
     encodedHeaderAndPayload ++ ('.' +: DecodedJwt.encodedSignature(encodedHeaderAndPayload, algorithm, secret))
