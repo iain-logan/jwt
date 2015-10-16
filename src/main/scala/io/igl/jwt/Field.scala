@@ -10,4 +10,4 @@ trait Field {
 
 }
 
-trait JwtField extends Field
+abstract class JwtField extends Field
