@@ -4,10 +4,23 @@ This library is a Scala implementation of the JSON Web Token (JWT) [specificatio
 If you are not familiar with JWTs, then I suggest you check out [this](https://developer.atlassian.com/static/connect/docs/latest/concepts/understanding-jwt.html) article.
 # Goal
 This project aims to abstract away from the raw strings and json often seen in JWT implementations. We instead leverage types for a stricter and more robust implementation.
+# Getting it
+Currently this project is not published externally, so local publishing is required. This will change soon.
+- Clone the repository
+  - `git clone https://github.com/iain-logan/jwt.git`
+- Launch `sbt` in the project and publish locally
+  - `cd jwt`
+  - `sbt` (If using activator do `activator shell` instead)
+  - `publish-local` (If using activator do `publishLocal` instead)
+- Add the following line to your build.sbt
+  - `libraryDependencies ++= Seq("io.igl" %% "jwt" % "1.0.0")`
+- Now import into your project
+  - `import io.igl.jwt._`
+
 # Usage
 Creating headers and claims 
 ---------------------------
-This library contains implementations of all the registered claims and headers laid out in the JWT specification 
+This library contains implementations of all the registered claims and headers laid out in the JWT specification.
 ```scala
 // The Algorithm object contains various valid encryption methods, per the JWT specification.
 // Creating an alg header.
