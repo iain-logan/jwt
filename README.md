@@ -49,7 +49,7 @@ DecodedJwt.validateEncodedJwt(
   Set(Iss)          // The set of claims we require
 )
 ```
-Returns a DecodedJwt wrapped in Success on success, otherwise Failure.
+Returns a `DecodedJwt` wrapped in `Success` on success, otherwise `Failure`.
 
 Per the JWT specification, you can mark fields as ignored during validation. See this [test](https://github.com/iain-logan/jwt/blob/master/src/test/scala/io/igl/jwt/JwtSpec.scala?#L80) for an example.
 Private headers and claims
@@ -79,5 +79,12 @@ object Uid extends ClaimField {
 }
 ```
 New fields created like this can be used in exactly the same manner as the registered fields already implemented in this library.
+
+You will need to add `play-json` as a dependency to your project. Do this by adding the below line to your build.sbt
+file.
+
+```
+libraryDependencies ++= Seq("com.typesafe.play" %% "play-json" % "2.4.0")
+```
 # License
 This software is licensed under the MIT license, see [LICENSE](https://github.com/iain-logan/jwt/blob/master/LICENSE).
