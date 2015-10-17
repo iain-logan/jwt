@@ -98,7 +98,7 @@ object DecodedJwt {
         val mac: Mac = Mac.getInstance(algorithm.toString)
         mac.init(new SecretKeySpec(secret.getBytes("utf-8"), algorithm.toString))
         encodeBase64Url(mac.doFinal(encodedHeaderAndPayload.getBytes("utf-8")))
-      case Algorithm.NONE => encodedHeaderAndPayload
+      case Algorithm.NONE => ""
     }
 
   private def constantTimeIsEqual(as: Array[Byte], bs: Array[Byte]): Boolean = {
@@ -113,7 +113,6 @@ object DecodedJwt {
    *
    * Any fields found in the jwt that are not in either the required set or the ignore set, will cause validation to fail.
    * Including an algorithm field in the requiredHeaders set is not needed, instead use the requiredAlg parameter.
-   * Please note that this will not validate exp or nbf claims.
    *
    * @param jwt an encrypted jwt
    * @param secret the secret to use when validating the signature
@@ -140,6 +139,7 @@ object DecodedJwt {
     // Extract the various parts of a JWT
     val parts: (String, String, String) = jwt.split('.') match {
       case Array(header, payload, signature) => (header, payload, signature)
+      case Array(header, payload) => (header, payload, "")
       case _ => throw new IllegalArgumentException("Jwt could not be split into a header, payload, and signature")
     }
 
@@ -181,10 +181,25 @@ object DecodedJwt {
       }
     }.getOrElse(throw new IllegalArgumentException("Decoded header could not be parsed to a JSON object"))
 
+    /** Time in seconds since 1970-01-01T00:00:00Z UTC **/
+    def now: Long = System.currentTimeMillis / 1000
+
     val claims = payloadJson.fields.flatMap {
       case (field, value) =>
         requiredClaims.find(x => x.name == field) match {
-          case Some(requiredClaim) => requiredClaim.attemptApply(value)
+          case Some(requiredClaim) => requiredClaim.attemptApply(value).map {
+            case exp: Exp =>
+              now < exp.value match {
+                case true  => exp
+                case false => throw new IllegalArgumentException("Jwt has expired")
+              }
+            case nbf: Nbf =>
+              now > nbf.value match {
+                case true  => nbf
+                case false => throw new IllegalArgumentException("Jwt is not yet valid")
+              }
+            case claim => claim
+          }
           case None =>
             ignoredClaims.find(_ == field).
               getOrElse(throw new IllegalArgumentException("Found claim that is in neither the required or ignored sets"))

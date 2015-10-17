@@ -8,6 +8,8 @@ class JwtSpec extends UnitSpec {
 
   val secret = "secret"
 
+  def now: Long = System.currentTimeMillis / 1000
+
   "A DecodedJwt" should "give the correct result when encrypted" in {
     val jwt = new DecodedJwt(Seq(Alg(Algorithm.HS256), Typ("JWT")), Seq(Sub("123456789")))
     val correctEncoding =
@@ -61,6 +63,37 @@ class JwtSpec extends UnitSpec {
   it should "always have an algorithm header, even when one is not provided, in which case it should be set to \"none\"" in {
     new DecodedJwt(Nil, Nil).getHeader[Alg] should be (Some(Alg(Algorithm.NONE)))
     new DecodedJwt(Seq(Alg(Algorithm.HS256)), Nil).getHeader[Alg] should be (Some(Alg(Algorithm.HS256)))
+  }
+
+  it should "support the none algorithm" in {
+    val jwt = new DecodedJwt(Seq(Typ("JWT")), Seq(Iss("foo")))
+    val encoded = jwt.encodedAndSigned(secret)
+
+    encoded should be ("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJpc3MiOiJmb28ifQ.")
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      Algorithm.NONE,
+      Set(Typ),
+      Set(Iss)
+    ) should be (Success(jwt))
+  }
+
+  it should "support the HS256 algorithm" in {
+    val jwt = new DecodedJwt(Seq(Alg(Algorithm.HS256), Typ("JWT")), Seq(Iss("foo")))
+    val encoded = jwt.encodedAndSigned(secret)
+
+    encoded should be ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJmb28ifQ.G1XNxLIxhWF4FFTI3TqZ6XIDorxNnx5J6kHe0jTb70s")
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      Algorithm.HS256,
+      Set(Typ),
+      Set(Iss)
+    ) should be (Success(jwt))
+
   }
 
   it should "give correct results when asked for various headers" in {
@@ -132,8 +165,8 @@ class JwtSpec extends UnitSpec {
     val sub = Sub("123456789")
     val audSingle = Aud("users")
     val audMany = Aud(Seq("admin", "users"))
-    val exp = Exp(1234567890L)
-    val nbf = Nbf(1234567890L)
+    val exp = Exp(now + 100)
+    val nbf = Nbf(now - 100)
     val iat = Iat(1234567890L)
     val jti = Jti("asdf1234")
     val claimsA = Seq[ClaimValue](iss, sub, audSingle, exp, nbf, iat, jti)
@@ -153,6 +186,58 @@ class JwtSpec extends UnitSpec {
       alg.value,
       Set(),
       claimsB.map(_.field).toSet) should be (Success(jwtB))
+  }
+
+  it should "not be created from an expired jwt" in {
+    val jwt = new DecodedJwt(Seq(), Seq(Exp(now - 100)))
+
+    DecodedJwt.validateEncodedJwt(
+      jwt.encodedAndSigned(secret),
+      secret,
+      Algorithm.NONE,
+      Set(),
+      Set(Exp)
+    ).isFailure should be (true)
+  }
+
+  it should "be able to ignore the exp claim" in {
+    val jwt = new DecodedJwt(Seq(Typ("JWT")), Seq(Exp(now - 100)))
+
+    DecodedJwt.validateEncodedJwt(
+      jwt.encodedAndSigned(secret),
+      secret,
+      Algorithm.NONE,
+      Set(Typ),
+      Set(),
+      Set(),
+      Set(Exp.name)
+    ) should be (Success(new DecodedJwt(Seq(Typ("JWT")), Seq())))
+  }
+
+  it should "not be created from a not yet valid jwt" in {
+    val jwt = new DecodedJwt(Seq(), Seq(Nbf(now + 100)))
+
+    DecodedJwt.validateEncodedJwt(
+      jwt.encodedAndSigned(secret),
+      secret,
+      Algorithm.NONE,
+      Set(),
+      Set(Nbf)
+    ).isFailure should be (true)
+  }
+
+  it should "be able to ignore the nbf claim" in {
+    val jwt = new DecodedJwt(Seq(Typ("JWT")), Seq(Nbf(now + 100)))
+
+    DecodedJwt.validateEncodedJwt(
+      jwt.encodedAndSigned(secret),
+      secret,
+      Algorithm.NONE,
+      Set(Typ),
+      Set(),
+      Set(),
+      Set(Nbf.name)
+    ) should be (Success(new DecodedJwt(Seq(Typ("JWT")), Seq())))
   }
 
   it should "support private unregistered fields" in {
@@ -181,7 +266,6 @@ class JwtSpec extends UnitSpec {
       alg.value,
       Set(),
       Set(Uid)) should be (Success(jwt))
-
   }
 
 }

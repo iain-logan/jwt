@@ -64,9 +64,9 @@ DecodedJwt.validateEncodedJwt(
 ```
 Returns a `DecodedJwt` wrapped in `Success` on success, otherwise `Failure`.
 
-This will only validate a JWT in the sense that its signature is valid, no attempts are made to reject tokens that have expired due to the exp claim etc.
+This will validate the JWT cryptographically, and also the exp and nbf claims.
 
-Per the JWT specification, you can mark fields as ignored during validation. See this [test](https://github.com/iain-logan/jwt/blob/master/src/test/scala/io/igl/jwt/JwtSpec.scala?#L80) for an example.
+Per the JWT specification, you can mark fields as ignored during validation. See this [test](https://github.com/iain-logan/jwt/blob/master/src/test/scala/io/igl/jwt/JwtSpec.scala?#L130) for an example.
 
 Private headers and claims
 --------------------------
