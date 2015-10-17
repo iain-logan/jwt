@@ -9,5 +9,3 @@ trait JwtField {
   val name: String
 
 }
-//
-//abstract class JwtField extends Field

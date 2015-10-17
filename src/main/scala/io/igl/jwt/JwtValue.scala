@@ -17,5 +17,3 @@ trait JwtValue {
   val jsValue: JsValue
 
 }
-//
-//abstract class JwtValue extends Value
