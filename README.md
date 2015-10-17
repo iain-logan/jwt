@@ -1,4 +1,4 @@
-# jwt
+# jwt [![Build Status](https://travis-ci.org/iain-logan/jwt.svg?branch=master)](https://travis-ci.org/iain-logan/jwt)
 This library is a Scala implementation of the JSON Web Token (JWT) [specification](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html).
 
 If you are not familiar with JWTs, then I suggest you check out [this](https://developer.atlassian.com/static/connect/docs/latest/concepts/understanding-jwt.html) article.
