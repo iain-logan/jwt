@@ -34,6 +34,23 @@ class JwtSpec extends UnitSpec {
     afterJwt should be (Success(beforeJwt))
   }
 
+  it should "not be created if a different secret is used when decoding an encoded jwt" in {
+    val algorithm = Algorithm.HS256
+    val requiredHeaders = Set[HeaderField](Typ)
+    val requiredClaims  = Set[ClaimField](Sub)
+    val headers = Seq[HeaderValue](Typ("JWT"), Alg(algorithm))
+    val claims  = Seq[ClaimValue](Sub("1234567890"))
+
+    val jwt = new DecodedJwt(headers, claims)
+
+    DecodedJwt.validateEncodedJwt(
+      jwt.encodedAndSigned(secret),
+      secret + secret,
+      algorithm,
+      requiredHeaders,
+      requiredClaims).isFailure should be (true)
+  }
+
   it should "use the last occurrence of a header/claim when multiple headers/claims of the same type are provided" in {
     val lastTyp = Typ("JWT")
     val lastSub = Sub("12345")

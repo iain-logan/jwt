@@ -101,6 +101,13 @@ object DecodedJwt {
       case Algorithm.NONE => encodedHeaderAndPayload
     }
 
+  private def constantTimeIsEqual(as: Array[Byte], bs: Array[Byte]): Boolean = {
+    as.length == bs.length match {
+      case true => (as zip bs).foldLeft (0) {(r, ab) => r + (ab._1 ^ ab._2)} == 0
+      case _ => false
+    }
+  }
+
   /**
    * Attempts to construct a DecodedJwt from an encoded jwt.
    *
@@ -189,10 +196,9 @@ object DecodedJwt {
       throw new IllegalArgumentException("Provided jwt did not contain all required headers")
 
     // Validate signature
-    if (claims.size != claims.size)
-      throw new IllegalArgumentException("The required claims did not match the encoded jwts claims")
+    val correctSignature = encodedSignature(header + ('.' +: payload), requiredAlg, secret)
 
-    if (signature.equals(encodedSignature(header + ('.' +: payload), requiredAlg, secret)))
+    if (constantTimeIsEqual(signature.getBytes("utf-8"), correctSignature.getBytes("utf-8")))
       new DecodedJwt(headers, claims)
     else
       throw new IllegalArgumentException("Signature is incorrect")
