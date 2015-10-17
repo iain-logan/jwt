@@ -64,7 +64,7 @@ DecodedJwt.validateEncodedJwt(
 ```
 Returns a `DecodedJwt` wrapped in `Success` on success, otherwise `Failure`.
 
-This will only validate a JWT in the sense that its signature is valid, no attempts are made to reject tokens that have expired due to the to exp claim etc.
+This will only validate a JWT in the sense that its signature is valid, no attempts are made to reject tokens that have expired due to the exp claim etc.
 
 Per the JWT specification, you can mark fields as ignored during validation. See this [test](https://github.com/iain-logan/jwt/blob/master/src/test/scala/io/igl/jwt/JwtSpec.scala?#L80) for an example.
 
@@ -96,7 +96,7 @@ object Uid extends ClaimField {
 ```
 New fields created like this can be used in exactly the same manner as the registered fields already implemented in this library.
 
-You will need to add `play-json` as a dependency to your project. Do this by adding the below line to your build.sbt
+You will need to add `play-json` as a dependency to your project when using private fields. Do this by adding the below line to your build.sbt
 file.
 
 ```
