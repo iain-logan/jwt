@@ -13,7 +13,7 @@ Currently this project is not published externally, so local publishing is requi
   - `sbt` (If using activator do `activator shell` instead)
   - `publish-local` (If using activator do `publishLocal` instead)
 - Add the following line to your build.sbt
-  - `libraryDependencies ++= Seq("io.igl" %% "jwt" % "1.0.0")`
+  - `libraryDependencies ++= Seq("io.igl" %% "jwt" % "1.1.0")`
 - Now import into your project
   - `import io.igl.jwt._`
 
