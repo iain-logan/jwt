@@ -115,7 +115,7 @@ object DecodedJwt {
    * @param requiredClaims the claims the encrypted jwt is required to use
    * @param ignoredHeaders the headers to ignore should the encrypted jwt use them
    * @param ignoredClaims the claims to ignore should the encrypted jwt use them
-   * @return returns a [[DecodedJwt]] wrapped in [[scala.util.Success]] when successful, otherwise [[scala.util.Failure]]
+   * @return returns a [[DecodedJwt]] wrapped in Success when successful, otherwise Failure
    */
   def validateEncodedJwt(
     jwt: String,
