@@ -3,11 +3,11 @@ package io.igl.jwt
 /**
  * A representation of a jwt field.
  */
-trait Field {
+trait JwtField {
 
   /** The value to use of the field name **/
   val name: String
 
 }
-
-abstract class JwtField extends Field
+//
+//abstract class JwtField extends Field

@@ -5,10 +5,10 @@ import play.api.libs.json._
 /**
  * A representation of a jwt field value.
  */
-trait Value {
+trait JwtValue {
 
   /** The field to which a value belongs **/
-  val field: Field
+  val field: JwtField
 
   /** The real value of a field **/
   val value: Any
@@ -17,5 +17,5 @@ trait Value {
   val jsValue: JsValue
 
 }
-
-abstract class JwtValue extends Value
+//
+//abstract class JwtValue extends Value

@@ -23,9 +23,9 @@ class DecodedJwt(headers_ : Seq[HeaderValue], claims_ : Seq[ClaimValue]) extends
   private val headers = withOutDuplicateOccurrence(headers_.reverse :+ Alg(Algorithm.NONE)).reverse
   private val claims = withOutDuplicateOccurrence(claims_.reverse).reverse
 
-  private def withOutDuplicateOccurrence(values: Seq[Value]): Seq[Value] = {
+  private def withOutDuplicateOccurrence(values: Seq[JwtValue]): Seq[JwtValue] = {
 
-    def withOutOccurrence(target: Field, values: Seq[Value]): Seq[Value] = values match {
+    def withOutOccurrence(target: JwtField, values: Seq[JwtValue]): Seq[JwtValue] = values match {
       case Seq() => Seq()
       case v +: vs if v.field.name == target.name => withOutOccurrence(target, vs)
       case v +: vs => v +: withOutOccurrence(target, vs)
@@ -48,7 +48,7 @@ class DecodedJwt(headers_ : Seq[HeaderValue], claims_ : Seq[ClaimValue]) extends
   private val algorithm = getHeader[Alg].map(_.value).get
 
   def encodedAndSigned(secret: String): String = {
-    def jsAssign(value: Value) = value.field.name -> value.jsValue
+    def jsAssign(value: JwtValue) = value.field.name -> value.jsValue
 
     val encodedHeader: String = DecodedJwt.encodeBase64Url(JsObject(headers.map(jsAssign)).toString())
     val encodedPayload: String = DecodedJwt.encodeBase64Url(JsObject(claims.map(jsAssign)).toString())
