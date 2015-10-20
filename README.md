@@ -22,7 +22,6 @@ Creating headers and claims
 ---------------------------
 This library contains implementations of all the registered claims and headers laid out in the JWT specification.
 ```scala
-// The Algorithm object contains various valid encryption methods, per the JWT specification.
 // Creating an alg header.
 Alg(Algorithm.HS256)
 
@@ -50,29 +49,30 @@ jwt.encodedAndSigned("secret")
 ```
 Validating an encoded JWT
 -------------------------
-The below will attempt to validate a JWT.
 
-Note that the alg header should not be in the required headers, as all JWTs require it already.
+Should we want to validate a JWT similar to the above example, we would do the following.
+
 ```scala
 DecodedJwt.validateEncodedJwt(
-  jwt,              // An encoded jwt as a string
-  "secret",         // The secret to validate the signature against
-  Algorithm.HS256,  // The algorithm we require
-  Set(Typ),         // The set of headers we require (excluding alg)
-  Set(Iss)          // The set of claims we require
+  jwt,                       // An encoded jwt as a string
+  "secret",                  // The key to validate the signature against
+  Algorithm.HS256,           // The algorithm we require
+  Set(Typ),                  // The set of headers we require (excluding alg)
+  Set(Iss),                  // The set of claims we require
+  iss = Some(Iss("readme"))  // The iss claim to require (similar optional arguments exist for all registered claims)
 )
 ```
 Returns a `DecodedJwt` wrapped in `Success` on success, otherwise `Failure`.
 
-This will validate the JWT cryptographically, and also the exp and nbf claims.
+Note that the alg header should not be in the required headers, as is it required by all JWTs already.
 
-Per the JWT specification, you can mark fields as ignored during validation. See this [test](https://github.com/iain-logan/jwt/blob/master/src/test/scala/io/igl/jwt/JwtSpec.scala?#L160) for an example.
+Per the JWT specification, you can mark fields as ignored during validation. See this [test](https://github.com/iain-logan/jwt/blob/master/src/test/scala/io/igl/jwt/JwtSpec.scala?#L160) for examples.
 
 Private headers and claims
 --------------------------
 A JWT library would be pretty underwhelming if you couldn't use headers and claims outwith those outlined in the JWT specification.
 
-Here is how to make a custom claim, Uid.
+Here is how to make a custom claim, uid.
 ```scala
 // I use a Long for uids, so we use that as the value type
 case class Uid(value: Long) extends ClaimValue {
