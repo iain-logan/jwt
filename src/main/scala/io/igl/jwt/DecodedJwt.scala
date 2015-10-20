@@ -130,7 +130,12 @@ object DecodedJwt {
     requiredHeaders: Set[HeaderField],
     requiredClaims: Set[ClaimField],
     ignoredHeaders: Set[String] = Set(),
-    ignoredClaims: Set[String] = Set()): Try[Jwt] = Try {
+    ignoredClaims: Set[String] = Set(),
+    iss: Option[Iss] = None,
+    aud: Option[Aud] = None,
+    iat: Option[Iat] = None,
+    sub: Option[Sub] = None,
+    jti: Option[Jti] = None): Try[Jwt] = Try {
 
     require(requiredHeaders.map(_.name).size == requiredHeaders.size, "Required headers contains field name collisions")
     require(requiredClaims.map(_.name).size == requiredClaims.size, "Required claims contains field name collisions")
@@ -198,6 +203,31 @@ object DecodedJwt {
                 case true  => nbf
                 case false => throw new IllegalArgumentException("Jwt is not yet valid")
               }
+            case fIss: Iss =>
+              iss.map(_.equals(fIss) match {
+                case true => fIss
+                case false => throw new IllegalArgumentException("Iss didn't match required iss")
+              }).getOrElse(fIss)
+            case fAud: Aud =>
+              aud.map(_.equals(fAud) match {
+                case true => fAud
+                case false => throw new IllegalArgumentException("Aud didn't match required aud")
+              }).getOrElse(fAud)
+            case fIat: Iat =>
+              iat.map(_.equals(fIat) match {
+                case true => fIat
+                case false => throw new IllegalArgumentException("Iat didn't match required iat")
+              }).getOrElse(fIat)
+            case fSub: Sub =>
+              sub.map(_.equals(fSub) match {
+                case true => fSub
+                case false => throw new IllegalArgumentException("Sub didn't match required sub")
+              }).getOrElse(fSub)
+            case fJti: Jti =>
+              jti.map(_.equals(fJti) match {
+                case true => fJti
+                case false => throw new IllegalArgumentException("Jti didn't match required jti")
+              }).getOrElse(fJti)
             case claim => claim
           }
           case None =>

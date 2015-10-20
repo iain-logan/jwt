@@ -268,4 +268,129 @@ class JwtSpec extends UnitSpec {
       Set(Uid)) should be (Success(jwt))
   }
 
+  it should "check if a specific iss claim is required when creating from an encoded jwt" in {
+    val alg = Alg(Algorithm.HS256)
+    val iss = Iss("jeff")
+    val jwt = new DecodedJwt(Seq(alg), Seq(iss))
+    val encoded = jwt.encodedAndSigned(secret)
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(),
+      Set(Iss),
+      iss = Some(iss)
+    ) should be (Success(jwt))
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(),
+      Set(Iss),
+      iss = Some(Iss(iss.value + "a"))
+    ).isFailure should be (true)
+  }
+
+  it should "check if a specific aud claim is required when creating from an encoded jwt" in {
+    val alg = Alg(Algorithm.HS256)
+    val aud = Aud("jeff")
+    val jwt = new DecodedJwt(Seq(alg), Seq(aud))
+    val encoded = jwt.encodedAndSigned(secret)
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(),
+      Set(Aud),
+      aud = Some(aud)
+    ) should be (Success(jwt))
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(),
+      Set(Aud),
+      aud = Some(Aud(aud.value.left + "a"))
+    ).isFailure should be (true)
+  }
+
+  it should "check if a specific iat claim is required when creating from an encoded jwt" in {
+    val alg = Alg(Algorithm.HS256)
+    val iat = Iat(1234567890L)
+    val jwt = new DecodedJwt(Seq(alg), Seq(iat))
+    val encoded = jwt.encodedAndSigned(secret)
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(),
+      Set(Iat),
+      iat = Some(iat)
+    ) should be (Success(jwt))
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(),
+      Set(Iat),
+      iat = Some(Iat(iat.value + 1))
+    ).isFailure should be (true)
+  }
+
+  it should "check if a specific sub claim is required when creating from an encoded jwt" in {
+    val alg = Alg(Algorithm.HS256)
+    val sub = Sub("jeff")
+    val jwt = new DecodedJwt(Seq(alg), Seq(sub))
+    val encoded = jwt.encodedAndSigned(secret)
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(),
+      Set(Sub),
+      sub = Some(sub)
+    ) should be (Success(jwt))
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(),
+      Set(Sub),
+      sub = Some(Sub(sub.value + "a"))
+    ).isFailure should be (true)
+  }
+
+  it should "check if a specific jti claim is required when creating from an encoded jwt" in {
+    val alg = Alg(Algorithm.HS256)
+    val jti = Jti("asdf")
+    val jwt = new DecodedJwt(Seq(alg), Seq(jti))
+    val encoded = jwt.encodedAndSigned(secret)
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(),
+      Set(Jti),
+      jti = Some(jti)
+    ) should be (Success(jwt))
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(),
+      Set(Jti),
+      jti = Some(Jti(jti.value + "a"))
+    ).isFailure should be (true)
+  }
+
 }
