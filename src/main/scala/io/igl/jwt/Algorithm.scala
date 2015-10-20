@@ -14,6 +14,16 @@ object Algorithm {
     override def toString = "HmacSHA256"
   }
 
+  case object HS384 extends Algorithm {
+    override val name = "HS384"
+    override def toString = "HmacSHA384"
+  }
+
+  case object HS512 extends Algorithm {
+    override val name = "HS512"
+    override def toString = "HmacSHA512"
+  }
+
   case object NONE extends Algorithm {
     override val name = "none"
   }
@@ -26,6 +36,8 @@ object Algorithm {
   def getAlgorithm(name: String): Option[Algorithm] = name match {
     case HS256.name => Some(HS256)
     case NONE.name => Some(NONE)
+    case HS384.name => Some(HS384)
+    case HS512.name => Some(HS512)
     case _ => None
   }
 

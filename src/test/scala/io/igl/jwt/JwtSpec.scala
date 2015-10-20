@@ -1,5 +1,6 @@
 package io.igl.jwt
 
+import io.igl.jwt.Algorithm.{HS512, HS384}
 import play.api.libs.json.{JsNumber, JsValue}
 
 import scala.util.Success
@@ -66,6 +67,7 @@ class JwtSpec extends UnitSpec {
   }
 
   it should "support the none algorithm" in {
+    val alg = Alg(Algorithm.NONE)
     val jwt = new DecodedJwt(Seq(Typ("JWT")), Seq(Iss("foo")))
     val encoded = jwt.encodedAndSigned(secret)
 
@@ -74,14 +76,15 @@ class JwtSpec extends UnitSpec {
     DecodedJwt.validateEncodedJwt(
       encoded,
       secret,
-      Algorithm.NONE,
+      alg.value,
       Set(Typ),
       Set(Iss)
     ) should be (Success(jwt))
   }
 
   it should "support the HS256 algorithm" in {
-    val jwt = new DecodedJwt(Seq(Alg(Algorithm.HS256), Typ("JWT")), Seq(Iss("foo")))
+    val alg = Alg(Algorithm.HS256)
+    val jwt = new DecodedJwt(Seq(alg, Typ("JWT")), Seq(Iss("foo")))
     val encoded = jwt.encodedAndSigned(secret)
 
     encoded should be ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJmb28ifQ.G1XNxLIxhWF4FFTI3TqZ6XIDorxNnx5J6kHe0jTb70s")
@@ -89,11 +92,38 @@ class JwtSpec extends UnitSpec {
     DecodedJwt.validateEncodedJwt(
       encoded,
       secret,
-      Algorithm.HS256,
+      alg.value,
       Set(Typ),
       Set(Iss)
     ) should be (Success(jwt))
+  }
 
+  it should "support the HS384 algorithm" in {
+    val alg = Alg(Algorithm.HS384)
+    val jwt = new DecodedJwt(Seq(alg, Typ("JWT")), Seq(Iss("foo")))
+    val encoded = jwt.encodedAndSigned(secret)
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(Typ),
+      Set(Iss)
+    ) should be (Success(jwt))
+  }
+
+  it should "support the HS512 algorithm" in {
+    val alg = Alg(Algorithm.HS512)
+    val jwt = new DecodedJwt(Seq(alg, Typ("JWT")), Seq(Iss("foo")))
+    val encoded = jwt.encodedAndSigned(secret)
+
+    DecodedJwt.validateEncodedJwt(
+      encoded,
+      secret,
+      alg.value,
+      Set(Typ),
+      Set(Iss)
+    ) should be (Success(jwt))
   }
 
   it should "give correct results when asked for various headers" in {

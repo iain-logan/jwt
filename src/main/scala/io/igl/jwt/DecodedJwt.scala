@@ -92,14 +92,22 @@ object DecodedJwt {
    * @param secret the secret to sign with
    * @return a string representing the signature of a jwt
    */
-  private def encodedSignature(encodedHeaderAndPayload: String, algorithm: Algorithm, secret: String = ""): String =
-    algorithm match {
-      case Algorithm.HS256 =>
-        val mac: Mac = Mac.getInstance(algorithm.toString)
-        mac.init(new SecretKeySpec(secret.getBytes("utf-8"), algorithm.toString))
-        encodeBase64Url(mac.doFinal(encodedHeaderAndPayload.getBytes("utf-8")))
-      case Algorithm.NONE => ""
+  private def encodedSignature(encodedHeaderAndPayload: String, algorithm: Algorithm, secret: String = ""): String = {
+    import io.igl.jwt.Algorithm._
+
+    def hmac(alg: Algorithm) = {
+      val mac: Mac = Mac.getInstance(alg.toString)
+      mac.init(new SecretKeySpec(secret.getBytes("utf-8"), alg.toString))
+      encodeBase64Url(mac.doFinal(encodedHeaderAndPayload.getBytes("utf-8")))
     }
+
+    algorithm match {
+      case HS256 => hmac(HS256)
+      case HS384 => hmac(HS384)
+      case HS512 => hmac(HS512)
+      case NONE => ""
+    }
+  }
 
   private def constantTimeIsEqual(as: Array[Byte], bs: Array[Byte]): Boolean = {
     as.length == bs.length match {
@@ -115,17 +123,22 @@ object DecodedJwt {
    * Including an algorithm field in the requiredHeaders set is not needed, instead use the requiredAlg parameter.
    *
    * @param jwt an encrypted jwt
-   * @param secret the secret to use when validating the signature
+   * @param key the key to use when validating the signature
    * @param requiredAlg the algorithm to require and use when validating the signature
    * @param requiredHeaders the headers the encrypted jwt is required to use
    * @param requiredClaims the claims the encrypted jwt is required to use
    * @param ignoredHeaders the headers to ignore should the encrypted jwt use them
    * @param ignoredClaims the claims to ignore should the encrypted jwt use them
+   * @param iss used optionally, when you want to only validate a jwt where its required iss claim is equal to this
+   * @param aud used optionally, when you want to only validate a jwt where its required aud claim is equal to this
+   * @param iat used optionally, when you want to only validate a jwt where its required iat claim is equal to this
+   * @param sub used optionally, when you want to only validate a jwt where its required sub claim is equal to this
+   * @param jti used optionally, when you want to only validate a jwt where its required jti claim is equal to this
    * @return returns a [[DecodedJwt]] wrapped in Success when successful, otherwise Failure
    */
   def validateEncodedJwt(
     jwt: String,
-    secret: String,
+    key: String,
     requiredAlg: Algorithm,
     requiredHeaders: Set[HeaderField],
     requiredClaims: Set[ClaimField],
@@ -241,7 +254,7 @@ object DecodedJwt {
       throw new IllegalArgumentException("Provided jwt did not contain all required headers")
 
     // Validate signature
-    val correctSignature = encodedSignature(header + ('.' +: payload), requiredAlg, secret)
+    val correctSignature = encodedSignature(header + ('.' +: payload), requiredAlg, key)
 
     if (constantTimeIsEqual(signature.getBytes("utf-8"), correctSignature.getBytes("utf-8")))
       new DecodedJwt(headers, claims)
