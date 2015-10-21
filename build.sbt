@@ -2,7 +2,7 @@ name := "jwt"
 
 organization := "io.igl"
 
-version := "1.1.2"
+version := "1.2.0"
 
 scalaVersion := "2.11.7"
 
