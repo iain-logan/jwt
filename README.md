@@ -5,17 +5,9 @@ If you are not familiar with JWTs, then I suggest you check out [this](https://d
 # Goal
 This project aims to abstract away from the raw strings and json often seen in JWT implementations. We instead leverage types for a stricter and more robust implementation.
 # Getting it
-Currently this project is not published externally, so local publishing is required. This will change soon.
-- Clone the repository
-  - `git clone https://github.com/iain-logan/jwt.git`
-- Launch `sbt` in the project and publish locally
-  - `cd jwt`
-  - `sbt` (If using activator do `activator shell` instead)
-  - `publish-local` (If using activator do `publishLocal` instead)
-- Add the following line to your build.sbt
-  - `libraryDependencies ++= Seq("io.igl" %% "jwt" % "1.1.2")`
-- Now import into your project
-  - `import io.igl.jwt._`
+Simply add the following to your build.sbt file:
+
+`libraryDependencies ++= Seq("io.igl" %% "jwt" % "1.2.0")`
 
 # Usage
 Creating headers and claims 
