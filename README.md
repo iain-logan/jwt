@@ -56,7 +56,7 @@ DecodedJwt.validateEncodedJwt(
 ```
 Returns a `DecodedJwt` wrapped in `Success` on success, otherwise `Failure`.
 
-Note that the alg header should not be in the required headers, as is it required by all JWTs already.
+Note that the alg header should not be in the required headers, as it is required by all JWTs already.
 
 Per the JWT specification, you can mark fields as ignored during validation. See this [test](https://github.com/iain-logan/jwt/blob/master/src/test/scala/io/igl/jwt/JwtSpec.scala?#L160) for examples.
 
