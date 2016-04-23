@@ -88,11 +88,5 @@ object Uid extends ClaimField {
 ```
 New fields created like this can be used in exactly the same manner as the registered fields already implemented in this library.
 
-You will need to add `play-json` as a dependency to your project when using private fields. Do this by adding the below line to your build.sbt
-file.
-
-```
-libraryDependencies ++= Seq("com.typesafe.play" %% "play-json" % "2.4.0")
-```
 # License
 This software is licensed under the MIT license, see [LICENSE](https://github.com/iain-logan/jwt/blob/master/LICENSE).
