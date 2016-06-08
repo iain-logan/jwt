@@ -76,7 +76,7 @@ case class Uid(value: Long) extends ClaimValue {
   override val jsValue: JsValue = JsNumber(value)
 }
 
-object Uid extends ClaimField {
+object Uid extends (Long => Uid) with ClaimField {
 
   // A function that attempts to construct our claim from a json value
   override def attemptApply(value: JsValue): Option[ClaimValue] =
