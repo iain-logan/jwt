@@ -76,7 +76,7 @@ class DecodedJwt(headers_ : Seq[HeaderValue], claims_ : Seq[ClaimValue]) extends
 object DecodedJwt {
 
   /** Returns the Base64 decoded version of provided string **/
-  private def decodeBase64(subject: String): String = new String(Base64.decodeBase64(subject))
+  private def decodeBase64(subject: String, charset: String): String = new String(Base64.decodeBase64(subject), charset)
 
   /** Returns the Base64 url safe encoding of a byte array **/
   private def encodeBase64Url(subject: Array[Byte]): String = Base64.encodeBase64URLSafeString(subject)
@@ -148,7 +148,8 @@ object DecodedJwt {
     aud: Option[Aud] = None,
     iat: Option[Iat] = None,
     sub: Option[Sub] = None,
-    jti: Option[Jti] = None): Try[Jwt] = Try {
+    jti: Option[Jti] = None,
+    charset: String = "UTF-8"): Try[Jwt] = Try {
 
     require(requiredHeaders.map(_.name).size == requiredHeaders.size, "Required headers contains field name collisions")
     require(requiredClaims.map(_.name).size == requiredClaims.size, "Required claims contains field name collisions")
@@ -167,7 +168,7 @@ object DecodedJwt {
 
     // Validate headers
     val headerJson = Try {
-      Json.parse(decodeBase64(header)) match {
+      Json.parse(decodeBase64(header, charset)) match {
         case header: JsObject => header
         case _ => throw new IllegalArgumentException()
       }
@@ -193,7 +194,7 @@ object DecodedJwt {
 
     // Validate payload
     val payloadJson = Try {
-      Json.parse(decodeBase64(payload)) match {
+      Json.parse(decodeBase64(payload, charset)) match {
         case header: JsObject => header
         case _ => throw new IllegalArgumentException()
       }
