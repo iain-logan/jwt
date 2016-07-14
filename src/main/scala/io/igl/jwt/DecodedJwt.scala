@@ -1,5 +1,6 @@
 package io.igl.jwt
 
+import java.nio.charset.StandardCharsets.UTF_8
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import org.apache.commons.codec.binary.Base64
@@ -48,6 +49,10 @@ class DecodedJwt(headers_ : Seq[HeaderValue], claims_ : Seq[ClaimValue]) extends
   private val algorithm = getHeader[Alg].map(_.value).get
 
   def encodedAndSigned(secret: String): String = {
+    encodedAndSigned(secret.getBytes(UTF_8))
+  }
+
+  def encodedAndSigned(secret: Array[Byte]): String = {
     def jsAssign(value: JwtValue) = value.field.name -> value.jsValue
 
     val encodedHeader: String = DecodedJwt.encodeBase64Url(JsObject(headers.map(jsAssign)).toString())
@@ -85,19 +90,19 @@ object DecodedJwt {
   private def encodeBase64Url(subject: String): String = encodeBase64Url(subject.getBytes("utf-8"))
 
   /**
-   * Returns the signature of a jwt.
-   *
-   * @param encodedHeaderAndPayload the encoded header and payload of a jwt
-   * @param algorithm the algorithm to be used
-   * @param secret the secret to sign with
-   * @return a string representing the signature of a jwt
-   */
-  private def encodedSignature(encodedHeaderAndPayload: String, algorithm: Algorithm, secret: String = ""): String = {
+    * Returns the signature of a jwt.
+    *
+    * @param encodedHeaderAndPayload the encoded header and payload of a jwt
+    * @param algorithm               the algorithm to be used
+    * @param secret                  the secret to sign with
+    * @return a string representing the signature of a jwt
+    */
+  private def encodedSignature(encodedHeaderAndPayload: String, algorithm: Algorithm, secret: Array[Byte] = Array()): String = {
     import io.igl.jwt.Algorithm._
 
     def hmac(alg: Algorithm) = {
       val mac: Mac = Mac.getInstance(alg.toString)
-      mac.init(new SecretKeySpec(secret.getBytes("utf-8"), alg.toString))
+      mac.init(new SecretKeySpec(secret, alg.toString))
       encodeBase64Url(mac.doFinal(encodedHeaderAndPayload.getBytes("utf-8")))
     }
 
@@ -117,39 +122,60 @@ object DecodedJwt {
   }
 
   /**
-   * Attempts to construct a DecodedJwt from an encoded jwt.
-   *
-   * Any fields found in the jwt that are not in either the required set or the ignore set, will cause validation to fail.
-   * Including an algorithm field in the requiredHeaders set is not needed, instead use the requiredAlg parameter.
-   *
-   * @param jwt an encrypted jwt
-   * @param key the key to use when validating the signature
-   * @param requiredAlg the algorithm to require and use when validating the signature
-   * @param requiredHeaders the headers the encrypted jwt is required to use
-   * @param requiredClaims the claims the encrypted jwt is required to use
-   * @param ignoredHeaders the headers to ignore should the encrypted jwt use them
-   * @param ignoredClaims the claims to ignore should the encrypted jwt use them
-   * @param iss used optionally, when you want to only validate a jwt where its required iss claim is equal to this
-   * @param aud used optionally, when you want to only validate a jwt where its required aud claim is equal to this
-   * @param iat used optionally, when you want to only validate a jwt where its required iat claim is equal to this
-   * @param sub used optionally, when you want to only validate a jwt where its required sub claim is equal to this
-   * @param jti used optionally, when you want to only validate a jwt where its required jti claim is equal to this
-   * @return returns a [[DecodedJwt]] wrapped in Success when successful, otherwise Failure
-   */
+    * This method use the underlying method {@link #validateEncodedJwtWithEncodedSecret(String,Array[Byte],Algorithm,Set[HeaderField],Set[ClaimField],Set[String],Set[String],Option[Iss],Option[Aud], Option[Iat], Option[Sub],Option[Jti],String)},
+    * by providing the secret with {@link String#getBytes(StandardCharsets#UTF_8)}
+    */
   def validateEncodedJwt(
-    jwt: String,
-    key: String,
-    requiredAlg: Algorithm,
-    requiredHeaders: Set[HeaderField],
-    requiredClaims: Set[ClaimField],
-    ignoredHeaders: Set[String] = Set(),
-    ignoredClaims: Set[String] = Set(),
-    iss: Option[Iss] = None,
-    aud: Option[Aud] = None,
-    iat: Option[Iat] = None,
-    sub: Option[Sub] = None,
-    jti: Option[Jti] = None,
-    charset: String = "UTF-8"): Try[Jwt] = Try {
+                          jwt: String,
+                          key: String,
+                          requiredAlg: Algorithm,
+                          requiredHeaders: Set[HeaderField],
+                          requiredClaims: Set[ClaimField],
+                          ignoredHeaders: Set[String] = Set(),
+                          ignoredClaims: Set[String] = Set(),
+                          iss: Option[Iss] = None,
+                          aud: Option[Aud] = None,
+                          iat: Option[Iat] = None,
+                          sub: Option[Sub] = None,
+                          jti: Option[Jti] = None,
+                          charset: String = "UTF-8"): Try[Jwt] = {
+    validateEncodedJwtWithEncodedSecret(jwt, key.getBytes(UTF_8), requiredAlg, requiredHeaders, requiredClaims, ignoredHeaders, ignoredClaims, iss, aud, iat, sub, jti, charset)
+  }
+
+  /**
+    * Attempts to construct a DecodedJwt from an encoded jwt.
+    *
+    * Any fields found in the jwt that are not in either the required set or the ignore set, will cause validation to fail.
+    * Including an algorithm field in the requiredHeaders set is not needed, instead use the requiredAlg parameter.
+    *
+    * @param jwt             an encrypted jwt
+    * @param key             the key to use when validating the signature
+    * @param requiredAlg     the algorithm to require and use when validating the signature
+    * @param requiredHeaders the headers the encrypted jwt is required to use
+    * @param requiredClaims  the claims the encrypted jwt is required to use
+    * @param ignoredHeaders  the headers to ignore should the encrypted jwt use them
+    * @param ignoredClaims   the claims to ignore should the encrypted jwt use them
+    * @param iss             used optionally, when you want to only validate a jwt where its required iss claim is equal to this
+    * @param aud             used optionally, when you want to only validate a jwt where its required aud claim is equal to this
+    * @param iat             used optionally, when you want to only validate a jwt where its required iat claim is equal to this
+    * @param sub             used optionally, when you want to only validate a jwt where its required sub claim is equal to this
+    * @param jti             used optionally, when you want to only validate a jwt where its required jti claim is equal to this
+    * @return returns a [[DecodedJwt]] wrapped in Success when successful, otherwise Failure
+    */
+  def validateEncodedJwtWithEncodedSecret(
+                          jwt: String,
+                          key: Array[Byte],
+                          requiredAlg: Algorithm,
+                          requiredHeaders: Set[HeaderField],
+                          requiredClaims: Set[ClaimField],
+                          ignoredHeaders: Set[String] = Set(),
+                          ignoredClaims: Set[String] = Set(),
+                          iss: Option[Iss] = None,
+                          aud: Option[Aud] = None,
+                          iat: Option[Iat] = None,
+                          sub: Option[Sub] = None,
+                          jti: Option[Jti] = None,
+                          charset: String = "UTF-8"): Try[Jwt] = Try {
 
     require(requiredHeaders.map(_.name).size == requiredHeaders.size, "Required headers contains field name collisions")
     require(requiredClaims.map(_.name).size == requiredClaims.size, "Required claims contains field name collisions")

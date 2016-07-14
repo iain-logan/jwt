@@ -1,6 +1,7 @@
 package io.igl.jwt
 
-import io.igl.jwt.Algorithm.{HS512, HS384}
+import io.igl.jwt.Algorithm.{HS384, HS512}
+import org.apache.commons.codec.binary.Base64
 import play.api.libs.json.{JsNumber, JsValue}
 
 import scala.util.Success
@@ -423,4 +424,21 @@ class JwtSpec extends UnitSpec {
     ).isFailure should be (true)
   }
 
+  it should "support Base64 Encoded Secret" in {
+    val decoder = new Base64(true)
+    val alg = Alg(Algorithm.HS256)
+    val jwt = new DecodedJwt(Seq(alg, Typ("JWT")), Seq(Iss("foo")))
+    val decodedSecret:Array[Byte] = decoder.decode(secret)
+    val encoded = jwt.encodedAndSigned(decodedSecret)
+
+   encoded should be ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJmb28ifQ.M-3mD1aZMseTJW_lnV2_YKuMXcMKIBVevaSYLU4P3zE")
+
+    DecodedJwt.validateEncodedJwtWithEncodedSecret(
+      encoded,
+      decodedSecret,
+      alg.value,
+      Set(Typ),
+      Set(Iss)
+    ) should be (Success(jwt))
+  }
 }
