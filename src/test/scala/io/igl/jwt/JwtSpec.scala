@@ -428,7 +428,7 @@ class JwtSpec extends UnitSpec {
     val decoder = new Base64(true)
     val alg = Alg(Algorithm.HS256)
     val jwt = new DecodedJwt(Seq(alg, Typ("JWT")), Seq(Iss("foo")))
-    val decodedSecret:Array[Byte] = decoder.decode(secret)
+    val decodedSecret : Array[Byte] = decoder.decode(secret)
     val encoded = jwt.encodedAndSigned(decodedSecret)
 
    encoded should be ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJmb28ifQ.M-3mD1aZMseTJW_lnV2_YKuMXcMKIBVevaSYLU4P3zE")

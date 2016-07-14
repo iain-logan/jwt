@@ -122,7 +122,7 @@ object DecodedJwt {
   }
 
   /**
-    * This method use the underlying method {@link #validateEncodedJwtWithEncodedSecret(String,Array[Byte],Algorithm,Set[HeaderField],Set[ClaimField],Set[String],Set[String],Option[Iss],Option[Aud], Option[Iat], Option[Sub],Option[Jti],String)},
+    * This method uses the underlying method {@link #validateEncodedJwtWithEncodedSecret(String,Array[Byte],Algorithm,Set[HeaderField],Set[ClaimField],Set[String],Set[String],Option[Iss],Option[Aud], Option[Iat], Option[Sub],Option[Jti],String)},
     * by providing the secret with {@link String#getBytes(StandardCharsets#UTF_8)}
     */
   def validateEncodedJwt(
@@ -139,7 +139,20 @@ object DecodedJwt {
                           sub: Option[Sub] = None,
                           jti: Option[Jti] = None,
                           charset: String = "UTF-8"): Try[Jwt] = {
-    validateEncodedJwtWithEncodedSecret(jwt, key.getBytes(UTF_8), requiredAlg, requiredHeaders, requiredClaims, ignoredHeaders, ignoredClaims, iss, aud, iat, sub, jti, charset)
+    validateEncodedJwtWithEncodedSecret(
+                                        jwt,
+                                        key.getBytes(UTF_8),
+                                        requiredAlg,
+                                        requiredHeaders,
+                                        requiredClaims,
+                                        ignoredHeaders,
+                                        ignoredClaims,
+                                        iss,
+                                        aud,
+                                        iat,
+                                        sub,
+                                        jti,
+                                        charset)
   }
 
   /**
