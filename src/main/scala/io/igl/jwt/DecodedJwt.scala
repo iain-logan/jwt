@@ -291,7 +291,7 @@ object DecodedJwt {
     }
 
     if (claims.size != requiredClaims.size)
-      throw new IllegalArgumentException("Provided jwt did not contain all required headers")
+      throw new IllegalArgumentException("Provided jwt did not contain all required claims")
 
     // Validate signature
     val correctSignature = encodedSignature(header + ('.' +: payload), requiredAlg, key)
