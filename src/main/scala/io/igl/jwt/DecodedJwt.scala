@@ -234,7 +234,7 @@ object DecodedJwt {
     // Validate payload
     val payloadJson = Try {
       Json.parse(decodeBase64(payload, charset)) match {
-        case header: JsObject => header
+        case payload: JsObject => payload
         case _ => throw new IllegalArgumentException()
       }
     }.getOrElse(throw new IllegalArgumentException("Decoded payload could not be parsed to a JSON object"))
