@@ -1,5 +1,8 @@
 package io.igl.jwt
 
+import java.security.{Signature, KeyFactory}
+import java.security.spec.PKCS8EncodedKeySpec
+
 import java.nio.charset.StandardCharsets.UTF_8
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -105,11 +108,21 @@ object DecodedJwt {
       mac.init(new SecretKeySpec(secret, alg.toString))
       encodeBase64Url(mac.doFinal(encodedHeaderAndPayload.getBytes("utf-8")))
     }
+    def rsa(alg: Algorithm) = {
+      val sign = Signature.getInstance(alg.name)
+      val keySpecPv = new PKCS8EncodedKeySpec(secret);
+      val kf = KeyFactory.getInstance("RSA");
+      val privateKey = kf.generatePrivate(keySpecPv)
+      sign.initSign(privateKey)
+      sign.update(encodedHeaderAndPayload.getBytes("utf-8"))
+      encodeBase64Url(sign.sign())
+    }
 
     algorithm match {
       case HS256 => hmac(HS256)
       case HS384 => hmac(HS384)
       case HS512 => hmac(HS512)
+      case RS256 => rsa(RS256)
       case NONE => ""
     }
   }

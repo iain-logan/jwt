@@ -24,6 +24,11 @@ object Algorithm {
     override def toString = "HmacSHA512"
   }
 
+  case object RS256 extends Algorithm {
+    override val name = "SHA256withRSA"
+    override def toString = "SHA256withRSA"
+  }
+
   case object NONE extends Algorithm {
     override val name = "none"
   }
@@ -38,6 +43,7 @@ object Algorithm {
     case NONE.name => Some(NONE)
     case HS384.name => Some(HS384)
     case HS512.name => Some(HS512)
+    case RS256.name => Some(RS256)
     case _ => None
   }
 
