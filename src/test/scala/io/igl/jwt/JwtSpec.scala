@@ -287,6 +287,23 @@ class JwtSpec extends UnitSpec {
     ) should be (Success(new DecodedJwt(Seq(Typ("JWT")), Seq())))
   }
 
+  it should "support the private scope claim" in {
+
+    val alg = Alg(Algorithm.HS256)
+    val scope = Scope("https://www.googleapis.com/auth/devstorage.read_write")
+    val jwt = new DecodedJwt(Seq(alg), Seq(scope))
+
+    jwt.getClaim[Scope] should be (Some(scope))
+
+    DecodedJwt.validateEncodedJwt(
+      jwt.encodedAndSigned(secret),
+      secret,
+      alg.value,
+      Set(),
+      Set(Scope)) should be (Success(jwt))
+  }
+
+
   it should "support private unregistered fields" in {
 
     object Uid extends ClaimField {
