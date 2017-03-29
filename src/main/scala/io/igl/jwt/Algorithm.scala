@@ -25,7 +25,7 @@ object Algorithm {
   }
 
   case object RS256 extends Algorithm {
-    override val name = "SHA256withRSA"
+    override val name = "RS256"
     override def toString = "SHA256withRSA"
   }
 

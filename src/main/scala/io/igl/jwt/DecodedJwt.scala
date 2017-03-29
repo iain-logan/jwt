@@ -109,7 +109,7 @@ object DecodedJwt {
       encodeBase64Url(mac.doFinal(encodedHeaderAndPayload.getBytes("utf-8")))
     }
     def rsa(alg: Algorithm) = {
-      val sign = Signature.getInstance(alg.name)
+      val sign = Signature.getInstance(alg.toString)
       val keySpecPv = new PKCS8EncodedKeySpec(secret);
       val kf = KeyFactory.getInstance("RSA");
       val privateKey = kf.generatePrivate(keySpecPv)
