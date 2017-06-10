@@ -2,7 +2,7 @@ name := "jwt"
 
 organization := "io.igl"
 
-version := "1.2.1"
+version := "1.2.2"
 
 scalaVersion := "2.12.1"
 crossScalaVersions := Seq("2.11.7", "2.12.1")
