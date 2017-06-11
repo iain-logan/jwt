@@ -7,7 +7,7 @@ This project aims to abstract away from the raw strings and json often seen in J
 # Getting it
 Simply add the following to your build.sbt file:
 
-`libraryDependencies += "io.igl" %% "jwt" % "1.2.0"`
+`libraryDependencies += "io.igl" %% "jwt" % "1.2.2"`
 
 # Usage
 Creating headers and claims 
