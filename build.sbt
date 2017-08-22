@@ -12,14 +12,8 @@ crossScalaVersions := Seq("2.11.11", "2.12.3")
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.6.3",
   "commons-codec" % "commons-codec" % "1.10",
-  scalatest(scalaVersion.value)
+  "org.scalatest" %% "scalatest" % "3.0.1" % Test
 )
-
-def scalatest(scalaVersion: String) = CrossVersion.partialVersion(scalaVersion) match {
-  case Some((2, 11)) => "org.scalatest" % "scalatest_2.11" % "2.2.4" % Test
-  case Some((2, 12)) => "org.scalatest" % "scalatest_2.12" % "3.0.1" % Test
-  case _ => sys.error("Unknown Scala version")
-}
 
 publishMavenStyle := true
 
