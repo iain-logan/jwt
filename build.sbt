@@ -10,16 +10,10 @@ scalaVersion := "2.12.3"
 crossScalaVersions := Seq("2.11.11", "2.12.3")
 
 libraryDependencies ++= Seq(
-  playjson(scalaVersion.value),
+  "com.typesafe.play" %% "play-json" % "2.6.3",
   "commons-codec" % "commons-codec" % "1.10",
   scalatest(scalaVersion.value)
 )
-
-def playjson(scalaVersion: String) = CrossVersion.partialVersion(scalaVersion) match {
-  case Some((2, 11)) => "com.typesafe.play" %% "play-json" % "2.4.0"
-  case Some((2, 12)) => "com.typesafe.play" %% "play-json" % "2.6.3"
-  case _ => sys.error("Unknown Scala version")
-}
 
 def scalatest(scalaVersion: String) = CrossVersion.partialVersion(scalaVersion) match {
   case Some((2, 11)) => "org.scalatest" % "scalatest_2.11" % "2.2.4" % Test
