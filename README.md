@@ -1,3 +1,13 @@
+# This pacakge is deprecated as of 2018-06-16
+I've let this project become neglected over the last few years.
+I simply don't have the time required to address pull requests and issues, let alone create bug fixes and implement new features.
+Instead of letting it rot over time, I've decided to officially deprecate this library.
+
+A note to anyone still interested in contributing to this library. I'd be very happy for it to be forked and continued under a new maintainer, please do feel free to do so. I'll be leaving the project here as public, there's no sense in removing it.
+
+All the best,
+Iain
+
 # jwt [![Build Status](https://travis-ci.org/iain-logan/jwt.svg?branch=master)](https://travis-ci.org/iain-logan/jwt)
 This library is a Scala implementation of the JSON Web Token (JWT) [specification](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html).
 
