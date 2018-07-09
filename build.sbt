@@ -1,27 +1,19 @@
+import sbt.Keys.scalaVersion
+
 name := "jwt"
 
 organization := "io.igl"
 
 version := "1.2.2"
 
-scalaVersion := "2.12.1"
-crossScalaVersions := Seq("2.11.7", "2.12.1")
+scalaVersion := "2.12.3"
+crossScalaVersions := Seq("2.11.11", "2.12.3")
 
 libraryDependencies ++= Seq(
-  playjson(scalaVersion.value),
+  "com.typesafe.play" %% "play-json" % "2.6.3",
   "commons-codec" % "commons-codec" % "1.10",
-  scalatest(scalaVersion.value)
+  "org.scalatest" %% "scalatest" % "3.0.1" % Test
 )
-
-def playjson(scalaVersion: String) = scalaVersion match {
-  case "2.12.1" => "com.typesafe.play" %% "play-json" % "2.6.0-M6"
-  case "2.11.7" => "com.typesafe.play" %% "play-json" % "2.4.0"
-}
-
-def scalatest(scalaVersion: String) = scalaVersion match {
-  case "2.12.1" => "org.scalatest" % "scalatest_2.12" % "3.0.1" % "test"
-  case "2.11.7" => "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test"
-}
 
 publishMavenStyle := true
 
