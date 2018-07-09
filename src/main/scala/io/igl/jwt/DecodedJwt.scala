@@ -129,7 +129,7 @@ object DecodedJwt {
 
   private def constantTimeIsEqual(as: Array[Byte], bs: Array[Byte]): Boolean = {
     as.length == bs.length match {
-      case true => (as zip bs).foldLeft (0) {(r, ab) => r + (ab._1 ^ ab._2)} == 0
+      case true => (as zip bs).foldLeft (0) {(r, ab) => r | (ab._1 ^ ab._2)} == 0
       case _ => false
     }
   }
